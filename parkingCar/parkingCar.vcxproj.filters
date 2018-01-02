@@ -14,4 +14,26 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="parkingCar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="parkingCar_base.cpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="parkingCar_debug.cpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="parkingCar_lang.cpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="parkingCar_zoomImage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="parkingCar_define.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
