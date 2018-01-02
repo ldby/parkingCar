@@ -94,6 +94,13 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>echo D | xcopy /E /R /Y $(ProjectDir)res $(OutDir)res
+echo F | xcopy /R /Y $(ProjectDir)parkingCar.ini $(OutDir)parkingCar.ini</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>复制游戏资源</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -126,6 +133,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>echo D | xcopy /E /R /Y $(ProjectDir)res $(OutDir)res
+echo F | xcopy /R /Y $(ProjectDir)parkingCar.ini $(OutDir)parkingCar.ini</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>复制游戏资源</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -149,11 +163,23 @@
     <ClCompile Include="parkingCar.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="parkingCar_base.cpp" />
-    <ClInclude Include="parkingCar_debug.cpp" />
+    <ClInclude Include="parkingCar_base.cpp">
+      <FileType>CppHeader</FileType>
+    </ClInclude>
+    <ClInclude Include="parkingCar_debug.cpp">
+      <FileType>CppHeader</FileType>
+    </ClInclude>
     <ClInclude Include="parkingCar_define.h" />
-    <ClInclude Include="parkingCar_lang.cpp" />
+    <ClInclude Include="parkingCar_lang.cpp">
+      <FileType>CppHeader</FileType>
+    </ClInclude>
     <ClInclude Include="parkingCar_zoomImage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="parkingCar.ini" />
+    <None Include="res\cfg_lang\zh-CN.ini" />
+    <None Include="res\cfg_scene\scene0.ini" />
+    <None Include="res\cfg_scene\scene1.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

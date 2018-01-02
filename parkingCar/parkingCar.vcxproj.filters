@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="资源文件\cfg_scene">
+      <UniqueIdentifier>{05befd5e-c0cb-4c5a-89b2-d54d040e0443}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\cfg_lang">
+      <UniqueIdentifier>{a9a3e01b-8599-4ca8-bf4d-b31386edf95d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parkingCar.cpp">
@@ -20,20 +26,34 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="parkingCar_base.cpp">
-      <Filter>源文件</Filter>
-    </ClInclude>
-    <ClInclude Include="parkingCar_debug.cpp">
-      <Filter>源文件</Filter>
-    </ClInclude>
-    <ClInclude Include="parkingCar_lang.cpp">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="parkingCar_zoomImage.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="parkingCar_define.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="parkingCar_lang.cpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="parkingCar_debug.cpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="parkingCar_base.cpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="parkingCar.ini">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\cfg_scene\scene0.ini">
+      <Filter>资源文件\cfg_scene</Filter>
+    </None>
+    <None Include="res\cfg_scene\scene1.ini">
+      <Filter>资源文件\cfg_scene</Filter>
+    </None>
+    <None Include="res\cfg_lang\zh-CN.ini">
+      <Filter>资源文件\cfg_lang</Filter>
+    </None>
   </ItemGroup>
 </Project>
