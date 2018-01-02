@@ -176,6 +176,7 @@ echo F | xcopy /R /Y $(ProjectDir)parkingCar.ini $(OutDir)parkingCar.ini</Comman
     <ClInclude Include="parkingCar_zoomImage.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\README.md" />
     <None Include="parkingCar.ini" />
     <None Include="res\cfg_lang\zh-CN.ini" />
     <None Include="res\cfg_scene\scene0.ini" />

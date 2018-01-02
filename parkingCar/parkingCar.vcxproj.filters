@@ -55,5 +55,8 @@
     <None Include="res\cfg_lang\zh-CN.ini">
       <Filter>资源文件\cfg_lang</Filter>
     </None>
+    <None Include="..\README.md">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>
