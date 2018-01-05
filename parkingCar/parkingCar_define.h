@@ -2,7 +2,7 @@
  * parkingCar_define.h 
  * 名称: 游戏主程序 常量与功能宏定义
  * 作者: 雷电暴雨
- * 时间: 2018-01-02 17:45:00
+ * 时间: 2018-01-05 13:35:00
  * 备注: 
  ***************************************/
 
@@ -18,9 +18,9 @@
 
 // ------ 数学物理常量 ------
 #define PI 3.14159265358979
-#define ACC_SPEED 1.6		// 加速度
+#define ACC_SPEED 1.3		// 加速度
 #define DEC_SPEED 1.5		// 减速度
-#define MAX_SPEED 16		// 最大速度
+#define MAX_SPEED 12		// 最大速度
 #define EPSINON 0.000001
 #define APS 90				// 每秒移动角度
 
@@ -44,8 +44,8 @@
 #define CMD_QUIT 16
 
 // ------ 功能性宏定义 ------
-#define _ax(x) ((int)(commConfig->UI_wZoomRate * x + 0.5))
-#define _ay(y) ((int)(commConfig->UI_hZoomRate * y + 0.5))
+#define _ax(x) (commConfig->UI_wZoomRate * x)
+#define _ay(y) (commConfig->UI_hZoomRate * y)
 
 /***************************
 ******** 常量定义结束 ********
@@ -59,11 +59,14 @@
 // ------ 车辆状态结构体 ------
 typedef struct Car {
 	int orgResId;				// 车体原始贴图资源 ID
-	int x, y;					// 贴图原点坐标
-	int realX, realY;		// 中心点坐标
+	double x, y;				// 贴图原点坐标
+	double realX, realY;		// 中心点坐标
 	double angle;				// 角度
 	double speed;				// 速度
+	char *range;				// 旋转后车辆实体区域
+	int bodyPx;					// 车体像素点总数目
 	int isqian, iszuo, isgas;	// 辅助调试用状态
+	int outPx, coveredPx;		// 辅助调试用状态
 } Car;
 
 // ------ 游戏设置结构体 ------

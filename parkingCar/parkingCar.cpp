@@ -2,9 +2,9 @@
  * parkingCar.cpp
  * 名称: 游戏主程序
  * 作者: 雷电暴雨
- * 版本：1.0.0.126
- * 时间: 2018-01-02 17:43:00
- * 备注: MileStone 2
+ * 版本: 1.0.1.131
+ * 时间: 2018-01-05 13:36:00
+ * 备注: MileStone 3
  ***************************************/
 
 #include <iostream>
@@ -129,29 +129,123 @@ void loadResources() {
 	Car *tCar 车辆指针
  返回值：无
  **************************************/
-void reDrawScene(IMAGE *img_map, Car *tCar) {
+void reDrawScene(IMAGE *img_map, Car *tCar, int isChangeAngel = 0, char *mapData = NULL, const int mapLen = 0) {
 	char debugInfo[1000];
 	LOGFONT f;
-
-	// 首先根据 angle 旋转车体 并设置背景为黑色
-	rotateimage(&g_myCarIMG, &g_carIMG[tCar->orgResId], tCar->angle / 180 * PI, O_BKCOLOR, true);
-
+	DWORD *pCarImg;
+	int i, j, carW, carH, nowX, nowY, nowOx, nowOy, nowOpos, coveredPx = 0, outPx = 0;
+	int isCrash = 0;
 	
 	BeginBatchDraw();
 	cleardevice();
 	putimage(0, 0, commConfig->UI_Width, commConfig->UI_Height, img_map, 0, 0);
 
-	tCar->x = (int)(tCar->realX - (g_myCarIMG.getwidth() / 2.0));
-	tCar->y = (int)(tCar->realY - (g_myCarIMG.getheight() / 2.0));
+	// 首先根据 angle 旋转车体 并设置背景为黑色
+	if (isChangeAngel) {
+		rotateimage(&g_myCarIMG, &g_carIMG[tCar->orgResId], tCar->angle / 180 * PI, O_BKCOLOR, true);
+	}
+	tCar->x = tCar->realX - (g_myCarIMG.getwidth() / 2.0);
+	tCar->y = tCar->realY - (g_myCarIMG.getheight() / 2.0);
 
-	_putimage(tCar->x, tCar->y, _ax(g_myCarIMG.getwidth()), _ay(g_myCarIMG.getheight()), g_myCarIMG, O_BKCOLOR);
+	if (mapData) {
+		carW = g_myCarIMG.getwidth();
+		carH = g_myCarIMG.getheight();
+		if (isChangeAngel || strlen(tCar->range) <= 1) {
+			pCarImg = GetImageBuffer(&g_myCarIMG);
+			tCar->bodyPx = 0;
+			for (i = 0, nowY = (int)(tCar->y); i < carH; i++, nowY++) {
+				for (j = 0, nowX = (int)(tCar->x); j < carW; j++, nowX++) {
+					if (pCarImg[i * carW + j] == 0x000000) {
+						tCar->range[i * carW + j] = '0';
+					}
+					else {
+						tCar->range[i * carW + j] = '1';
+						tCar->bodyPx++;
+						if (nowX < 0 || nowX > commConfig->UI_Width || nowY < 0 || nowY > commConfig->UI_Height) {
+							outPx++;
+							continue;
+						}
+						else {
+							nowOx = (int)(nowX / commConfig->UI_wZoomRate + 0.5);
+							nowOy = (int)(nowY / commConfig->UI_hZoomRate + 0.5);
+							nowOpos = nowOy * O_WIDTH + nowOx;
+							if (mapData[nowOy * O_WIDTH + nowOx] == '0') {
+								isCrash = 1;
+								break;
+							}
+							else if (mapData[nowOy * O_WIDTH + nowOx] == '9') {
+								coveredPx++;
+							}
+						}
+					}
+				}
+				if (isCrash) break;
+			}
+		}
+		else {
+			for (i = 0, nowY = (int)(tCar->y); i < carH; i++, nowY++) {
+				for (j = 0, nowX = (int)(tCar->x); j < carW; j++, nowX++) {
+					if (tCar->range[i * carW + j] == '1') {
+						if (nowX < 0 || nowX > commConfig->UI_Width || nowY < 0 || nowY > commConfig->UI_Height) {
+							outPx++;
+							continue;
+						}
+						else {
+							nowOx = (int)(nowX / commConfig->UI_wZoomRate + 0.5);
+							nowOy = (int)(nowY / commConfig->UI_hZoomRate + 0.5);
+							nowOpos = nowOy * O_WIDTH + nowOx;
+							if (mapData[nowOy * O_WIDTH + nowOx] == '0') {
+								isCrash = 1;
+								break;
+							}
+							else if (mapData[nowOy * O_WIDTH + nowOx] == '9') {
+								coveredPx++;
+							}
+						}
+					}
+				}
+				if (isCrash) break;
+			}
+		}
+		tCar->outPx = outPx;
+		tCar->coveredPx = coveredPx;
+	}
+	
+	_putimage(
+		(int)(tCar->x + 0.5),
+		(int)(tCar->y + 0.5),
+		(int)(_ax(g_myCarIMG.getwidth()) + 0.5),
+		(int)(_ay(g_myCarIMG.getheight()) + 0.5),
+		g_myCarIMG,
+		O_BKCOLOR
+	);
+	//putimage((int)(tCar->x + 0.5), (int)(tCar->y + 0.5), &g_myCarIMG);
 
-	_setFont(&f);
-	strcpy_s(debugInfo, _genDebugInfo(tCar).c_str());
-	RECT r = { 0, 0, commConfig->UI_Width, commConfig->UI_Height };
-	setbkmode(TRANSPARENT);
-	drawtext(debugInfo, &r, DT_LEFT);
+	// 调试模式下 绘制调试信息
+	if (g_logLevel < 3) {
+		_setFont(&f);
+		_genDebugInfo(tCar, debugInfo);
+		RECT r = { 0, 0, commConfig->UI_Width, commConfig->UI_Height };
+		setbkmode(TRANSPARENT);
+		drawtext(debugInfo, &r, DT_LEFT);
+
+		setfillcolor(RED);
+		fillcircle((int)(tCar->realX + 0.5), (int)(tCar->realY + 0.5), 3);
+	}
 	EndBatchDraw();
+
+	if (isCrash) {
+		MessageBox(graphicHwnd, "You crashed!", "Game over", MB_ICONERROR);
+		_callFunc("game_exit");
+	}
+	if (coveredPx && tCar->bodyPx && abs(coveredPx - tCar->bodyPx) < 5) {
+		MessageBox(graphicHwnd, "You win!", "Game clear", MB_ICONINFORMATION);
+		_callFunc("game_exit");
+	}
+	if (abs(tCar->bodyPx - outPx) < (int)(tCar->bodyPx * 0.2)) {
+		MessageBox(graphicHwnd, "You out!", "Game over", MB_ICONINFORMATION);
+		_callFunc("game_exit");
+	}
 }
 
 void updateCar(Car *tCar, int isGas, int isqian, int iszuo) {
@@ -159,8 +253,8 @@ void updateCar(Car *tCar, int isGas, int isqian, int iszuo) {
 	double _x = 0, _y = 0;
 
 	// 计算当前车中心点的坐标
-	tCar->realX = (int)(g_myCarIMG.getwidth() / 2.0 + tCar->x + 0.5);
-	tCar->realY = (int)(g_myCarIMG.getheight() / 2.0 + tCar->y + 0.5);
+	tCar->realX = g_myCarIMG.getwidth() / 2.0 + tCar->x;
+	tCar->realY = g_myCarIMG.getheight() / 2.0 + tCar->y;
 
 	// (-180, 180]
 	if (tCar->angle > 180) {
@@ -222,8 +316,8 @@ void updateCar(Car *tCar, int isGas, int isqian, int iszuo) {
 	if (tCar->speed > 0 || tCar->speed < 0) {
 		_x = -sin(tCar->angle / 180 * PI) * tCar->speed;
 		_y = -cos(tCar->angle / 180 * PI) * tCar->speed;
-		tCar->realX += (int)(_x + 0.5);
-		tCar->realY += (int)(_y + 0.5);
+		tCar->realX += _x;
+		tCar->realY += _y;
 
 		tCar->isqian = isqian;
 		tCar->iszuo = iszuo;
@@ -278,12 +372,12 @@ void initWelcomeScene() {
 
 		BeginBatchDraw();
 		cleardevice();
-		_setFont(&f, _ay(20));
+		_setFont(&f, (int)(_ay(20) + 0.5));
 
 		putimage(0, 0, &g_bgIMG[t]);
 
 		for (i = 0; i < btnCnt; i++) {
-			srcY = btns[i].status * _ay(50);
+			srcY = btns[i].status * (int)(_ay(50) + 0.5);
 			putimage(btns[i].x, btns[i].y, btns[i].r.right - btns[i].x, btns[i].r.bottom - btns[i].y, &g_objIMG[btns[i].resId], 0, srcY);
 			sprintf_s(szTemp, "ui_%s", btns[i].name);
 			drawtext(_L(szTemp), &btns[i].r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
@@ -305,46 +399,59 @@ void initGameScene(int sceneId) {
 	char szSceneCfgPath[MAX_PATH] = "";
 	char szTemp[255];
 	int keyStat = 0, mapResId = 0, myCarResId = 0;
+	char *mapData = (char *)malloc(O_WIDTH * O_HEIGHT * sizeof(char));
+	int mapLen = 0;
+	int i = 0;
+	int isChangeAngel = 0;
 
-	_initSceneConfig(sceneId, szSceneCfgPath);
+	_initSceneConfig(sceneId, szSceneCfgPath, mapData);
+	mapLen = strlen(mapData);
 	mapResId = GetPrivateProfileInt("map", "id", 0, szSceneCfgPath);
 	tCar.orgResId = GetPrivateProfileInt("car", "myResId", 0, szSceneCfgPath);
-	tCar.realX = GetPrivateProfileInt("car", "myrealX", 0, szSceneCfgPath);
-	tCar.realY = GetPrivateProfileInt("car", "myrealY", 0, szSceneCfgPath);
+	tCar.realX = (double)GetPrivateProfileInt("car", "myrealX", 0, szSceneCfgPath);
+	tCar.realY = (double)GetPrivateProfileInt("car", "myrealY", 0, szSceneCfgPath);
 	GetPrivateProfileString("car", "myAngle", "0", szTemp, 255, szSceneCfgPath);
 	sscanf_s(szTemp, "%lf", &tCar.angle);
 	tCar.speed = 0;
 	tCar.isqian = tCar.iszuo = tCar.isgas = 0;
 
 	rotateimage(&g_myCarIMG, &g_carIMG[tCar.orgResId], tCar.angle / 180 * PI, O_BKCOLOR, true);
-	tCar.x = (int)(tCar.realX - (g_myCarIMG.getwidth() / 2.0) + 0.5);
-	tCar.y = (int)(tCar.realY - (g_myCarIMG.getheight() / 2.0) + 0.5);
+	tCar.x = tCar.realX - (g_myCarIMG.getwidth() / 2.0);
+	tCar.y = tCar.realY - (g_myCarIMG.getheight() / 2.0);
+	tCar.range = (char *)malloc(sizeof(char) * O_WIDTH * O_HEIGHT);
+	tCar.range[0] = '\0';
+	tCar.bodyPx = 0;
 
-	reDrawScene(&g_mapIMG[mapResId], &tCar);
+	reDrawScene(&g_mapIMG[mapResId], &tCar, 0, mapData);
 
-	sprintf_s(szTemp, "g_myCarIMG width = %d, height = %d, tCar.x = %d, tCar.y = %d", g_myCarIMG.getwidth(), g_myCarIMG.getheight(), tCar.x, tCar.y);
+	sprintf_s(szTemp, "g_myCarIMG width = %d, height = %d, tCar.x = %.4lf, tCar.y = %.4lf", g_myCarIMG.getwidth(), g_myCarIMG.getheight(), tCar.x, tCar.y);
 
 	while (1) {
 		keyStat = _getCommand();
 		if (keyStat & CMD_UP) {
 			if (keyStat & CMD_LEFT) {
-				tCar.angle += (double)APS * (commConfig->UI_RefRate / 1000.0);
+				tCar.angle += (double)APS * (commConfig->UI_RefRate / 1000.0) * (tCar.speed / MAX_SPEED);
+				isChangeAngel = 1;
 			}
 			else if (keyStat & CMD_RIGHT) {
-				tCar.angle -= (double)APS * (commConfig->UI_RefRate / 1000.0);
+				tCar.angle -= (double)APS * (commConfig->UI_RefRate / 1000.0) * (tCar.speed / MAX_SPEED);
+				isChangeAngel = 1;
 			}
 		}
 
 		if (keyStat & CMD_DOWN) {
 			if (keyStat & CMD_LEFT) {
-				tCar.angle -= (double)APS * (commConfig->UI_RefRate / 1000.0);
+				tCar.angle += (double)APS * (commConfig->UI_RefRate / 1000.0) * (tCar.speed / MAX_SPEED);
+				isChangeAngel = 1;
 			}
 			else if (keyStat & CMD_RIGHT) {
-				tCar.angle += (double)APS * (commConfig->UI_RefRate / 1000.0);
+				tCar.angle -= (double)APS * (commConfig->UI_RefRate / 1000.0) * (tCar.speed / MAX_SPEED);
+				isChangeAngel = 1;
 			}
 		}
 		updateCar(&tCar, (keyStat & CMD_UP || keyStat & CMD_DOWN), keyStat & CMD_UP, keyStat & CMD_LEFT);
-		reDrawScene(&g_mapIMG[mapResId], &tCar);
+		reDrawScene(&g_mapIMG[mapResId], &tCar, isChangeAngel, mapData, mapLen);
+
 		Sleep(commConfig->UI_RefRate);
 	}
 

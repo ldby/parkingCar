@@ -2,7 +2,7 @@
  * parkingCar_debug.cpp
  * 名称: 游戏调试及日志记录相关
  * 作者: 雷电暴雨
- * 时间: 2018-01-02 17:44:00
+ * 时间: 2018-01-05 13:36:00
  * 备注: 
  ***************************************/
 
@@ -161,7 +161,7 @@ void _initLogFile() {
  返回值：
 	string 调试文本内容
  **************************************/
-string _genDebugInfo(Car *tCar) {
+void _genDebugInfo(Car *tCar, char *debugInfo) {
 	char buffer[80] = "", str[1000] = "";
 	strcat_s(str, commConfig->Pro_name);
 	strcat_s(str, " ");
@@ -172,13 +172,13 @@ string _genDebugInfo(Car *tCar) {
 	strcat_s(str, "\n");
 	strcat_s(str, "==== DEBUG INFO ====\n");
 	strcat_s(str, "Status of car\n");
-	sprintf_s(buffer, "X: %d\nY: %d\nAngle: %.6lf\nSpeed: %.6lf\n", tCar->x, tCar->y, tCar->angle, tCar->speed);
+	sprintf_s(buffer, "X: %.4lf\nY: %.4lf\nAngle: %.4lf\nSpeed: %.4lf\n", tCar->x, tCar->y, tCar->angle, tCar->speed);
 	strcat_s(str, buffer);
-	sprintf_s(buffer, "realX: %d\nrealY: %d\n", tCar->realX, tCar->realY);
+	sprintf_s(buffer, "realX: %.4lf\nrealY: %.4lf\n", tCar->realX, tCar->realY);
 	strcat_s(str, buffer);
-	sprintf_s(buffer, "isGas: %d\nisqian: %d\niszuo: %d\n", tCar->isgas, tCar->isqian, tCar->iszuo);
+	sprintf_s(buffer, "bodyPx: %d\ncoveredPx: %d\noutPx: %d\n", tCar->bodyPx, tCar->coveredPx, tCar->outPx);
 	strcat_s(str, buffer);
-	return string(str);
+	strcpy_s(debugInfo, 1000, str);
 }
 
 #endif

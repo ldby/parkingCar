@@ -2,7 +2,7 @@
  * parkingCar_base.cpp
  * 名称: 游戏主程序 功能性函数
  * 作者: 雷电暴雨
- * 时间: 2018-01-02 17:43:00
+ * 时间: 2018-01-05 13:01:00
  * 备注:
  ***************************************/
 
@@ -64,8 +64,8 @@ void _getBtnPos(const char *szSceneCfgPath, Button *btn, int btnId) {
 	sprintf_s(szBtnTag, "btn%d", btnId + 1);
 	btn->resId = GetPrivateProfileInt(szBtnTag, "resId", 0, szSceneCfgPath);
 	GetPrivateProfileString(szBtnTag, "name", "", btn->name, 50, szSceneCfgPath);
-	btn->x = _ax(GetPrivateProfileInt(szBtnTag, "x", 0, szSceneCfgPath));
-	btn->y = _ay(GetPrivateProfileInt(szBtnTag, "y", 0, szSceneCfgPath));
+	btn->x = (int)(_ax(GetPrivateProfileInt(szBtnTag, "x", 0, szSceneCfgPath)) + 0.5);
+	btn->y = (int)(_ay(GetPrivateProfileInt(szBtnTag, "y", 0, szSceneCfgPath)) + 0.5);
 	GetPrivateProfileString(szBtnTag, "func", "", btn->func, 50, szSceneCfgPath);
 	btn->r.left = btn->x;
 	btn->r.top = btn->y;
@@ -167,7 +167,12 @@ void _drawLoadingInfo(int isAllDone, char *szResName = "", int now = 1, int cnt 
 		sprintf_s(szBuffer, _L("ui_loading"), _L(szResName), now, cnt);
 	}
 
-	RECT r = { _ax(880), _ay(650), _ax(1250), _ay(680) };
+	RECT r = {
+		(int)(_ax(880) + 0.5), 
+		(int)(_ay(650) + 0.5), 
+		(int)(_ax(1250) + 0.5), 
+		(int)(_ay(680) + 0.5)
+	};
 	putimage(0, 0, &g_bgIMG[0]);
 	setbkmode(TRANSPARENT);
 	drawtext(szBuffer, &r, DT_LEFT | DT_SINGLELINE);
@@ -222,7 +227,12 @@ void _batchLoadImg(IMAGE *IMG_Arr, string res_path, char *szResName, int res_max
 			loadimage(&IMG_Arr[i], szResFilePath);
 			if (fabs(commConfig->UI_wZoomRate - 1.0) > EPSINON || fabs(commConfig->UI_hZoomRate - 1.0) > EPSINON) {
 				if (commConfig->UI_wZoomRate - 1.0 > EPSINON || commConfig->UI_hZoomRate - 1.0 > EPSINON) {
-					loadimage(&imgTmp, szResFilePath, _ax(IMG_Arr[i].getwidth()), _ay(IMG_Arr[i].getheight()), true);
+					loadimage(
+						&imgTmp, 
+						szResFilePath, 
+						(int)(_ax(IMG_Arr[i].getwidth()) + 0.5), 
+						(int)(_ay(IMG_Arr[i].getheight()) + 0.5), 
+						true);
 				}
 				else {
 					ZoomImage(&imgTmp, &IMG_Arr[i], commConfig->UI_wZoomRate, true, commConfig->UI_hZoomRate);
@@ -284,13 +294,27 @@ int _getCommand()
 	char *szSceneCfgPath 场景配置路径指针
  返回值：无
  **************************************/
-void _initSceneConfig(int sceneId, char *szSceneCfgPath) {
+void _initSceneConfig(int sceneId, char *szSceneCfgPath, char *mapData = NULL) {
 	static string _modName = "initSceneConfig";
-	char szLogTmp[500];
+	char szLogTmp[500], szPathTmp[MAX_PATH];
+	FILE *fp;
+	int i = 0, j = 0;
+
 	sprintf_s(szSceneCfgPath, MAX_PATH, "%s\\res\\cfg_scene\\scene%d.ini", g_szExePath, sceneId);
 	if (_access(szSceneCfgPath, 4) == -1) {
 		sprintf_s(szLogTmp, "Cannot access scene config file! Path = %s", szSceneCfgPath);
 		_log(_modName, szLogTmp, 3001, 5, 1);
+	}
+
+	if (mapData) {
+		sprintf_s(szPathTmp, "%s\\res\\map\\map%d.dat", g_szExePath, sceneId);
+
+		fopen_s(&fp, szPathTmp, "r");
+		if (!fp) {
+			sprintf_s(szLogTmp, "Cannot read map data file! Path = %s", szPathTmp);
+			_log(_modName, szLogTmp, 3002, 5, 1);
+		}
+		while ((mapData[i++] = fgetc(fp)) != EOF);
 	}
 }
 
