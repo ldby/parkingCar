@@ -58,5 +58,8 @@
     <None Include="..\README.md">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="res\cfg_scene\scene2.ini">
+      <Filter>资源文件\cfg_scene</Filter>
+    </None>
   </ItemGroup>
 </Project>

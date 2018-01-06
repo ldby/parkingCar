@@ -181,6 +181,7 @@ echo F | xcopy /R /Y $(ProjectDir)parkingCar.ini $(OutDir)parkingCar.ini</Comman
     <None Include="res\cfg_lang\zh-CN.ini" />
     <None Include="res\cfg_scene\scene0.ini" />
     <None Include="res\cfg_scene\scene1.ini" />
+    <None Include="res\cfg_scene\scene2.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,7 +2,7 @@
  * parkingCar_mapTool.cpp
  * 名称: 地图转换程序
  * 作者: 雷电暴雨
- * 版本: 1.0.1.131
+ * 版本: 1.0.1.132
  * 时间: 2018-01-05 13:38:00
  * 备注: MileStone 3
  ***************************************/
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 							pixelColor = pImgBuffer[srcW * i + j];
 							//pixelColor = (0xff0000 - (pixelColor & 0xff0000)) | (0x00ff00 - (pixelColor & 0x00ff00)) | (0x0000ff - (pixelColor & 0x0000ff));
 							if (pixelColor == 0x000000) {
-								fprintf_s(fp, "0", pixelColor);
+								fprintf_s(fp, "0");
 							}
 							else if (pixelColor == 0xff0000) {
 								fprintf_s(fp, "9");

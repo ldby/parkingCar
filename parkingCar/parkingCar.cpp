@@ -2,8 +2,8 @@
  * parkingCar.cpp
  * 名称: 游戏主程序
  * 作者: 雷电暴雨
- * 版本: 1.0.1.131
- * 时间: 2018-01-05 13:36:00
+ * 版本: 1.0.1.132
+ * 时间: 2018-01-07 00:02:00
  * 备注: MileStone 3
  ***************************************/
 
@@ -48,6 +48,8 @@ IMAGE g_myCarIMG;							// 控制车体贴图
 #include "parkingCar_lang.cpp"
 #include "parkingCar_debug.cpp"
 #include "parkingCar_base.cpp"
+
+void initGameScene(int sceneId);
 
 // =================== 游戏逻辑与控制开始 ===================
 
@@ -129,7 +131,7 @@ void loadResources() {
 	Car *tCar 车辆指针
  返回值：无
  **************************************/
-void reDrawScene(IMAGE *img_map, Car *tCar, int isChangeAngel = 0, char *mapData = NULL, const int mapLen = 0) {
+void reDrawScene(int sceneId, IMAGE *img_map, Car *tCar, int isChangeAngel = 0, char *mapData = NULL, const int mapLen = 0) {
 	char debugInfo[1000];
 	LOGFONT f;
 	DWORD *pCarImg;
@@ -235,16 +237,18 @@ void reDrawScene(IMAGE *img_map, Car *tCar, int isChangeAngel = 0, char *mapData
 	EndBatchDraw();
 
 	if (isCrash) {
-		MessageBox(graphicHwnd, "You crashed!", "Game over", MB_ICONERROR);
-		_callFunc("game_exit");
+		MessageBox(graphicHwnd, _L("ui_msg_crashed"), _L("ui_title"), MB_ICONERROR);
+		//_callFunc("game_exit");
+		initGameScene(sceneId);
 	}
 	if (coveredPx && tCar->bodyPx && abs(coveredPx - tCar->bodyPx) < 5) {
-		MessageBox(graphicHwnd, "You win!", "Game clear", MB_ICONINFORMATION);
-		_callFunc("game_exit");
+		MessageBox(graphicHwnd, _L("ui_msg_clear"), _L("ui_title"), MB_ICONINFORMATION);
+		initGameScene(++sceneId);
 	}
 	if (abs(tCar->bodyPx - outPx) < (int)(tCar->bodyPx * 0.2)) {
-		MessageBox(graphicHwnd, "You out!", "Game over", MB_ICONINFORMATION);
-		_callFunc("game_exit");
+		MessageBox(graphicHwnd, _L("ui_msg_out"), _L("ui_title"), MB_ICONINFORMATION);
+		//_callFunc("game_exit");
+		initGameScene(sceneId);
 	}
 }
 
@@ -422,7 +426,7 @@ void initGameScene(int sceneId) {
 	tCar.range[0] = '\0';
 	tCar.bodyPx = 0;
 
-	reDrawScene(&g_mapIMG[mapResId], &tCar, 0, mapData);
+	reDrawScene(sceneId, &g_mapIMG[mapResId], &tCar, 0, mapData);
 
 	sprintf_s(szTemp, "g_myCarIMG width = %d, height = %d, tCar.x = %.4lf, tCar.y = %.4lf", g_myCarIMG.getwidth(), g_myCarIMG.getheight(), tCar.x, tCar.y);
 
@@ -450,7 +454,7 @@ void initGameScene(int sceneId) {
 			}
 		}
 		updateCar(&tCar, (keyStat & CMD_UP || keyStat & CMD_DOWN), keyStat & CMD_UP, keyStat & CMD_LEFT);
-		reDrawScene(&g_mapIMG[mapResId], &tCar, isChangeAngel, mapData, mapLen);
+		reDrawScene(sceneId, &g_mapIMG[mapResId], &tCar, isChangeAngel, mapData, mapLen);
 
 		Sleep(commConfig->UI_RefRate);
 	}
